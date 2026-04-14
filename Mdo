@@ -1,15 +1,22 @@
-// ===============================
-// SIMPLE: ONLY SAND IS UNHIDDEN
-// ===============================
+runAfterLoad(function () {
 
-for (var el in elements) {
-    if (!elements[el]) continue;
+    function hideAllExceptSand() {
 
-    // hide everything first
-    elements[el].hidden = true;
-}
+        for (var el in elements) {
+            if (!elements[el]) continue;
 
-// unhide sand
-if (elements["sand"]) {
-    elements["sand"].hidden = false;
-}
+            elements[el].hidden = true;
+        }
+
+        if (elements["sand"]) {
+            elements["sand"].hidden = false;
+        }
+    }
+
+    // run immediately
+    hideAllExceptSand();
+
+    // run again after a short delay (fixes overwrite issues)
+    setTimeout(hideAllExceptSand, 500);
+
+});
