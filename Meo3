@@ -1,0 +1,32 @@
+
+// ===============================
+// ONLY SAND IS UNLOCKED MODE
+// ===============================
+
+function forceSandOnly() {
+
+    if (!window.elements || !settings) return;
+
+    for (var el in elements) {
+        if (!elements[el]) continue;
+
+        // force everything locked except sand
+        if (!settings.unlocked) settings.unlocked = {};
+
+        if (el === "sand") {
+            settings.unlocked[el] = true;
+        } else {
+            settings.unlocked[el] = false;
+        }
+    }
+}
+
+// run at every possible lifecycle stage
+runAfterLoad(forceSandOnly);
+
+runAfterAutogen(forceSandOnly);
+
+window.addEventListener("load", forceSandOnly);
+
+// repeat safety (because many alchemy games overwrite state)
+setInterval(forceSandOnly, 1000);
