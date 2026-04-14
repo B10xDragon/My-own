@@ -1,0 +1,120 @@
+// ===============================
+// 🎰 ELEMENT RNG GAMBLING MODE
+// ===============================
+
+// settings setup
+if (!settings.rngMode) {
+    settings.rngMode = true;
+}
+
+if (!settings.luck) {
+    settings.luck = 1;
+}
+
+// rarity weights (higher = more common)
+const rarityWeights = {
+    common: 1000,
+    uncommon: 400,
+    rare: 100,
+    epic: 25,
+    legendary: 5,
+    glitched: 1
+};
+
+// assign random rarity per element
+if (!settings.elementRarity) {
+    settings.elementRarity = {};
+
+    for (let el in elements) {
+        if (elements[el] && elements[el].category !== "tools") {
+            let roll = Math.random();
+
+            if (roll < 0.5) settings.elementRarity[el] = "common";
+            else if (roll < 0.75) settings.elementRarity[el] = "uncommon";
+            else if (roll < 0.9) settings.elementRarity[el] = "rare";
+            else if (roll < 0.97) settings.elementRarity[el] = "epic";
+            else if (roll < 0.995) settings.elementRarity[el] = "legendary";
+            else settings.elementRarity[el] = "glitched";
+        }
+    }
+}
+
+// hide everything (pure RNG mode)
+for (let el in elements) {
+    if (elements[el] && elements[el].category !== "tools") {
+        elements[el].hidden = true;
+    }
+}
+
+// weighted RNG pool generator
+function getRandomElement() {
+    let pool = [];
+
+    for (let el in elements) {
+        if (!elements[el] || elements[el].category === "tools") continue;
+
+        let rarity = settings.elementRarity[el] || "common";
+        let weight = rarityWeights[rarity] || 1;
+
+        for (let i = 0; i < weight; i++) {
+            pool.push(el);
+        }
+    }
+
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// luck modifier
+function rollLuck() {
+    return Math.random() * settings.luck;
+}
+
+// override element creation / spawning
+runAfterLoad(function () {
+
+    const oldCreatePixel = createPixel;
+
+    createPixel = function (element, x, y) {
+
+        let rngElement = getRandomElement();
+        let rarity = settings.elementRarity[rngElement] || "common";
+
+        // rare roll messages
+        if (rarity === "epic") {
+            console.log("🔥 EPIC ROLL: " + rngElement);
+        }
+
+        if (rarity === "legendary") {
+            console.log("⭐ LEGENDARY ROLL: " + rngElement);
+        }
+
+        if (rarity === "glitched") {
+            console.log("💀 GLITCHED ROLL: " + rngElement);
+            document.body.style.filter = "contrast(200%) hue-rotate(90deg)";
+            setTimeout(() => document.body.style.filter = "", 300);
+        }
+
+        return oldCreatePixel(rngElement, x, y);
+    };
+});
+
+// optional: improve visual feedback for rare elements when they appear in UI
+runAfterAutogen(function () {
+    for (let el in elements) {
+        if (!elements[el]) continue;
+
+        let rarity = settings.elementRarity[el];
+
+        if (rarity === "epic") {
+            elements[el].color = "#b400ff";
+        }
+
+        if (rarity === "legendary") {
+            elements[el].color = "#ffd700";
+        }
+
+        if (rarity === "glitched") {
+            elements[el].color = "#00ffea";
+        }
+    }
+});
