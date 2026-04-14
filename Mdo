@@ -1,0 +1,15 @@
+// ===============================
+// SIMPLE: ONLY SAND IS UNHIDDEN
+// ===============================
+
+for (var el in elements) {
+    if (!elements[el]) continue;
+
+    // hide everything first
+    elements[el].hidden = true;
+}
+
+// unhide sand
+if (elements["sand"]) {
+    elements["sand"].hidden = false;
+}
