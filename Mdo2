@@ -1,0 +1,42 @@
+
+// ===============================
+// FORCE ONLY SAND VISIBLE MODE
+// ===============================
+
+function enforceSandOnly() {
+
+    if (!window.elements) return;
+
+    for (var el in elements) {
+        if (!elements[el]) continue;
+
+        elements[el].hidden = true;
+    }
+
+    if (elements["sand"]) {
+        elements["sand"].hidden = false;
+    }
+}
+
+// 1. run immediately
+enforceSandOnly();
+
+// 2. run after load
+runAfterLoad(function () {
+    enforceSandOnly();
+});
+
+// 3. run after autogen (VERY IMPORTANT for alchemy games)
+runAfterAutogen(function () {
+    enforceSandOnly();
+});
+
+// 4. run repeatedly in case game overwrites it (this is the key fix)
+setInterval(function () {
+    enforceSandOnly();
+}, 1000);
+
+// 5. also run when window fully loads
+window.addEventListener("load", function () {
+    enforceSandOnly();
+});
